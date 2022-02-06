@@ -35,6 +35,12 @@ async function run() {
       res.send(services);
     });
 
+    //send all bookings
+    app.get("/bookings", async (req, res) => {
+      const cursor = officeBookingCollection.find({});
+      const bookings = await cursor.toArray();
+      res.send(bookings);
+    });
     //send single service
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
