@@ -35,20 +35,14 @@ async function run() {
       res.send(services);
     });
 
-    //send all bookings
-    app.get("/bookings", async (req, res) => {
-      const cursor = officeBookingCollection.find({});
-      const bookings = await cursor.toArray();
-      res.send(bookings);
-    });
     //send single service
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await servicesCollection.findOne(query);
       res.send(result);
-      console.log(id);
     });
+
     app.get("/booking/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -56,10 +50,35 @@ async function run() {
       res.send(result);
     });
 
+    //send user booking
+    app.get("/officeBookings", async (req, res) => {
+      const email = req.query.email;
+      const query = { senderEmail: email };
+      const cursor = officeBookingCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    //send user booking on tracking
+    app.get("/officeBookings/tracking", async (req, res) => {
+      const tracking = req.query.tracking;
+      const query = { tracking: tracking };
+      const cursor = officeBookingCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    //delete a booking
+    app.delete("/officeBookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await officeBookingCollection.deleteOne(query);
+      res.send(result);
+    });
+
     //receiving data
     app.post("/officeBookings", async (req, res) => {
       const officeBookings = req.body;
-      console.log(officeBookings);
       const result = await officeBookingCollection.insertOne(officeBookings);
       res.send(result);
     });
