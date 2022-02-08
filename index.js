@@ -35,6 +35,14 @@ async function run() {
       res.send(services);
     });
 
+    //add a service
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      console.log(service);
+      const result = await servicesCollection.insertOne(service);
+      res.send(result);
+    });
+
     //send single service
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
@@ -47,6 +55,12 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await servicesCollection.findOne(query);
+      res.send(result);
+    });
+    // send all bookings
+    app.get("/bookings", async (req, res) => {
+      const cursor = officeBookingCollection.find({});
+      const result = await cursor.toArray();
       res.send(result);
     });
 
@@ -65,6 +79,24 @@ async function run() {
       const query = { tracking: tracking };
       const cursor = officeBookingCollection.find(query);
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    //update booking status
+    app.put("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          bookingStatus: "Shipped",
+        },
+      };
+      const result = await officeBookingCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
       res.send(result);
     });
 
